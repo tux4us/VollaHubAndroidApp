@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Volla Wiki</string>
+    <string name="search">Suchen</string>
+    <string name="refresh">Aktualisieren</string>
+    <string name="error_loading">Fehler beim Laden: %s</string>
+    <string name="no_articles">Keine Artikel gefunden</string>
+</resources>
