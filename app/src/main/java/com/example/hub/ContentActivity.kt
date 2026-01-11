@@ -47,8 +47,17 @@ class ContentActivity : AppCompatActivity() {
             builtInZoomControls = true
             displayZoomControls = false
             setSupportZoom(true)
-            loadWithOverviewMode = true
+
+            // Wichtig für richtige Skalierung
             useWideViewPort = true
+            loadWithOverviewMode = true
+            layoutAlgorithm = android.webkit.WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
+
+            // Für bessere Lesbarkeit
+            textZoom = 100
+            minimumFontSize = 14
+            defaultFontSize = 16
+
             domStorageEnabled = true
         }
 
@@ -61,8 +70,14 @@ class ContentActivity : AppCompatActivity() {
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 binding.progressBar.visibility = View.GONE
+
+                // Zoom auf 150% für bessere Lesbarkeit
+                binding.webView.setInitialScale(150)
             }
         }
+
+        // Initial Scale setzen
+        binding.webView.setInitialScale(150)
     }
 
     private fun loadContent(url: String) {
