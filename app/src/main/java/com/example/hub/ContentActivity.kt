@@ -8,6 +8,7 @@ import android.view.View
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.volla.hub.databinding.ActivityContentBinding
 
@@ -28,6 +29,15 @@ class ContentActivity : AppCompatActivity() {
 
         setupWebView()
         loadContent(url)
+
+        // Back-Button Handler
+        onBackPressedDispatcher.addCallback(this) {
+            if (binding.webView.canGoBack()) {
+                binding.webView.goBack()
+            } else {
+                finish()
+            }
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -63,18 +73,10 @@ class ContentActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                onBackPressed()
+                finish()
                 true
             }
             else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    override fun onBackPressed() {
-        if (binding.webView.canGoBack()) {
-            binding.webView.goBack()
-        } else {
-            super.onBackPressed()
         }
     }
 }
