@@ -45,6 +45,10 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.title = "Volla Hub"
+
+        // Force weiße Toolbar-Icons
+        binding.toolbar.overflowIcon?.setTint(android.graphics.Color.WHITE)
+
         setupRecyclerViews()
         setupButtons()
         loadContent()
@@ -272,11 +276,32 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
 
+        // Erkenne ob Dark Mode aktiv ist
+        val nightMode = resources.configuration.uiMode and
+                android.content.res.Configuration.UI_MODE_NIGHT_MASK
+        val isDarkMode = nightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES
+
+        // Setze Textfarbe abhängig vom Theme
+        val textColor = if (isDarkMode) android.graphics.Color.WHITE else android.graphics.Color.BLACK
+
+        for (i in 0 until menu.size()) {
+            val item = menu.getItem(i)
+            val spanString = android.text.SpannableString(item.title.toString())
+            spanString.setSpan(
+                android.text.style.ForegroundColorSpan(textColor),
+                0,
+                spanString.length,
+                0
+            )
+            item.title = spanString
+        }
+
         val searchItem = menu.findItem(R.id.action_search)
         val searchView = searchItem.actionView as SearchView
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?) = false
+            override fun onQueryTextSubmit(query: String?): Boolean = false
+
             override fun onQueryTextChange(newText: String?): Boolean {
                 filterContent(newText ?: "")
                 return true

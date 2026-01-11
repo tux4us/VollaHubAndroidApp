@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.VollaHub" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">#730D0D</item>
+        <item name="colorPrimary">#D32F2F</item>
         <item name="colorPrimaryVariant">#B71C1C</item>
         <item name="colorOnPrimary">#FFFFFF</item>
         <item name="colorSecondary">#F44336</item>
-        <item name="colorSecondaryVariant">#730D0D</item>
+        <item name="colorSecondaryVariant">#D32F2F</item>
         <item name="colorOnSecondary">#FFFFFF</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
+
+        <!-- Menü-Farben -->
+        <item name="actionMenuTextColor">#FFFFFF</item>
+        <item name="popupMenuStyle">@style/PopupMenuStyle</item>
+    </style>
+
+    <style name="PopupMenuStyle" parent="Widget.MaterialComponents.PopupMenu">
+        <item name="android:dropDownSelector">@android:color/darker_gray</item>
+        <item name="android:textAppearanceLargePopupMenu">@style/TextAppearance.PopupMenu</item>
+        <item name="android:textAppearanceSmallPopupMenu">@style/TextAppearance.PopupMenu</item>
+    </style>
+
+    <style name="TextAppearance.PopupMenu" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#FFFFFF</item>
     </style>
 </resources>

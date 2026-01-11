@@ -5,19 +5,25 @@
     <item
         android:id="@+id/action_search"
         android:icon="@android:drawable/ic_menu_search"
+        android:iconTint="#FFFFFF"
         android:title="Suchen"
         app:showAsAction="ifRoom|collapseActionView"
-        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:iconTint="#FFFFFF" />
 
     <item
         android:id="@+id/action_theme"
         android:icon="@android:drawable/ic_menu_view"
+        android:iconTint="#FFFFFF"
         android:title="Design wechseln"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        app:iconTint="#FFFFFF" />
 
     <item
         android:id="@+id/action_refresh"
         android:icon="@android:drawable/ic_menu_rotate"
+        android:iconTint="#FFFFFF"
         android:title="Aktualisieren"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        app:iconTint="#FFFFFF" />
 </menu>

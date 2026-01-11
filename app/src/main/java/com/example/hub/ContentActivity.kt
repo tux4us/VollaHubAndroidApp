@@ -48,41 +48,79 @@ class ContentActivity : AppCompatActivity() {
             displayZoomControls = false
             setSupportZoom(true)
 
-            // Wichtig für richtige Skalierung
+            // Optimale Mobile-Einstellungen
             useWideViewPort = true
             loadWithOverviewMode = true
             layoutAlgorithm = android.webkit.WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
 
-            // Für bessere Lesbarkeit
-            textZoom = 100
+            // Bessere Schriftgrößen
+            textZoom = 100  // Standard 100%
             minimumFontSize = 14
             defaultFontSize = 16
 
             domStorageEnabled = true
         }
 
-        binding.webView.webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?) = false
-
-            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                binding.progressBar.visibility = View.VISIBLE
-            }
-
-            override fun onPageFinished(view: WebView?, url: String?) {
-                binding.progressBar.visibility = View.GONE
-
-                // Zoom auf 150% für bessere Lesbarkeit
-                binding.webView.setInitialScale(150)
-            }
-        }
-
-        // Initial Scale setzen
-        binding.webView.setInitialScale(150)
+        // Kein Initial Scale - lassen wir responsive arbeiten
     }
 
     private fun loadContent(url: String) {
         binding.progressBar.visibility = View.VISIBLE
-        binding.webView.loadUrl(url)
+
+        // Prüfe ob es eine Wiki-Seite ist
+        if (url.contains("wiki.volla.online")) {
+            // Lade Wiki-Seite mit mobilem Viewport
+            binding.webView.loadUrl(url)
+
+            // Injiziere CSS für mobile Darstellung nach dem Laden
+            binding.webView.webViewClient = object : WebViewClient() {
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    binding.progressBar.visibility = View.GONE
+
+                    // Injiziere mobile CSS
+                    view?.evaluateJavascript("""
+                    (function() {
+                        var meta = document.createElement('meta');
+                        meta.name = 'viewport';
+                        meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes';
+                        document.getElementsByTagName('head')[0].appendChild(meta);
+                        
+                        var style = document.createElement('style');
+                        style.innerHTML = `
+                            body { 
+                                font-size: 16px !important; 
+                                line-height: 1.6 !important;
+                                padding: 8px !important;
+                            }
+                            img { 
+                                max-width: 100% !important; 
+                                height: auto !important; 
+                            }
+                            table { 
+                                width: 100% !important; 
+                                font-size: 14px !important;
+                            }
+                            pre, code { 
+                                font-size: 13px !important; 
+                                overflow-x: auto !important;
+                            }
+                            #mw-navigation, .mw-jump-link { 
+                                display: none !important; 
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    })();
+                """, null)
+                }
+
+                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                    binding.progressBar.visibility = View.VISIBLE
+                }
+            }
+        } else {
+            // Normale Seiten
+            binding.webView.loadUrl(url)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
