@@ -13,8 +13,8 @@ android {
         applicationId = "com.volla.hub"
         minSdk = 24
         targetSdk = 36
-        versionCode = 7
-        versionName = "2.5"
+        versionCode = 8
+        versionName = "3.0"
     }
 
     buildTypes {
@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.swipe.refresh.layout)
     //implementation(libs.markwon.core)
     implementation(libs.jsoup)
+    implementation(libs.androidx.work)
 
     testImplementation(libs.junit)
 

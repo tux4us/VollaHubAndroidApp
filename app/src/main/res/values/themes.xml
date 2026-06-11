@@ -1,27 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.VollaHub" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">#D32F2F</item>
-        <item name="colorPrimaryVariant">#B71C1C</item>
+    <style name="Theme.VollaHub" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Hell-Theme (Light) -->
+        <item name="colorPrimary">#730D0D</item>
         <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorSecondary">#F44336</item>
-        <item name="colorSecondaryVariant">#D32F2F</item>
+        <item name="colorPrimaryContainer">#FFDAD6</item>
+        <item name="colorOnPrimaryContainer">#410002</item>
+        <item name="colorSecondary">#775652</item>
         <item name="colorOnSecondary">#FFFFFF</item>
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <item name="android:windowBackground">?android:attr/colorBackground</item>
+        <item name="colorSurface">#FFF8F6</item>
+        <item name="colorOnSurface">#231918</item>
+        <item name="colorOutline">#857371</item>
 
-        <!-- Menü-Farben -->
-        <item name="actionMenuTextColor">#FFFFFF</item>
-        <item name="popupMenuStyle">@style/PopupMenuStyle</item>
-    </style>
-
-    <style name="PopupMenuStyle" parent="Widget.MaterialComponents.PopupMenu">
-        <item name="android:dropDownSelector">@android:color/darker_gray</item>
-        <item name="android:textAppearanceLargePopupMenu">@style/TextAppearance.PopupMenu</item>
-        <item name="android:textAppearanceSmallPopupMenu">@style/TextAppearance.PopupMenu</item>
-    </style>
-
-    <style name="TextAppearance.PopupMenu" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:statusBarColor">#730D0D</item>
+        <item name="android:windowBackground">?attr/colorSurface</item>
     </style>
 </resources>

@@ -1,27 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.VollaHub" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">#D32F2F</item>
-        <item name="colorPrimaryVariant">#B71C1C</item>
+    <style name="Theme.VollaHub" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Echtes Dark-Theme (Black) -->
+        <item name="colorPrimary">#730D0D</item>
         <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorSecondary">#F44336</item>
-        <item name="colorSecondaryVariant">#D32F2F</item>
-        <item name="colorOnSecondary">#FFFFFF</item>
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <item name="android:windowBackground">?android:attr/colorBackground</item>
+        <item name="colorPrimaryContainer">#560003</item>
+        <item name="colorOnPrimaryContainer">#FFDAD6</item>
+        <item name="colorSecondary">#E7BDB8</item>
+        <item name="colorOnSecondary">#442926</item>
+        <item name="colorSurface">#000000</item>
+        <item name="colorOnSurface">#FFFFFF</item>
+        <item name="colorOutline">#857371</item>
+        <item name="colorSurfaceVariant">#212121</item>
+        <item name="colorOnSurfaceVariant">#E0E0E0</item>
 
-        <!-- Menü-Farben -->
-        <item name="actionMenuTextColor">#FFFFFF</item>
-        <item name="popupMenuStyle">@style/PopupMenuStyle</item>
-    </style>
+        <item name="android:statusBarColor">#730D0D</item>
+        <item name="android:windowBackground">#000000</item>
 
-    <style name="PopupMenuStyle" parent="Widget.MaterialComponents.PopupMenu">
-        <item name="android:dropDownSelector">@android:color/darker_gray</item>
-        <item name="android:textAppearanceLargePopupMenu">@style/TextAppearance.PopupMenu</item>
-        <item name="android:textAppearanceSmallPopupMenu">@style/TextAppearance.PopupMenu</item>
-    </style>
-
-    <style name="TextAppearance.PopupMenu" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">#FFFFFF</item>
+        <!-- Material 3 Card Fixes für Dark Mode -->
+        <item name="cardBackgroundColor">#121212</item>
     </style>
 </resources>
