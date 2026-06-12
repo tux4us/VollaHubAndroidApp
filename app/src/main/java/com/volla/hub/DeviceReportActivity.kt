@@ -189,6 +189,34 @@ class DeviceReportActivity : AppCompatActivity() {
         specs.append("\n--- SYSTEM ---\n")
         specs.append("FINGERPRINT: ${Build.FINGERPRINT}\n")
         
+        // Launcher Information
+        try {
+            val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
+            val resolveInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageManager.resolveActivity(intent, android.content.pm.PackageManager.ResolveInfoFlags.of(0L))
+            } else {
+                packageManager.resolveActivity(intent, 0)
+            }
+            
+            val launcherPackage = resolveInfo?.activityInfo?.packageName
+            if (launcherPackage != null) {
+                val pInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    packageManager.getPackageInfo(launcherPackage, android.content.pm.PackageManager.PackageInfoFlags.of(0L))
+                } else {
+                    packageManager.getPackageInfo(launcherPackage, 0)
+                }
+                val appInfo = pInfo.applicationInfo
+                if (appInfo != null) {
+                    val launcherName = packageManager.getApplicationLabel(appInfo).toString()
+                    val launcherVersion = pInfo.versionName ?: "Unbekannt"
+                    specs.append("LAUNCHER: $launcherName ($launcherPackage)\n")
+                    specs.append("LAUNCHER VERSION: $launcherVersion\n")
+                }
+            }
+        } catch (e: Exception) {
+            specs.append("LAUNCHER: Fehler beim Auslesen\n")
+        }
+        
         binding.tvDeviceSpecs.text = specs.toString()
     }
 

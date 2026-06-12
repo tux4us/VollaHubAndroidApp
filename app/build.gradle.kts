@@ -13,8 +13,8 @@ android {
         applicationId = "com.volla.hub"
         minSdk = 24
         targetSdk = 36
-        versionCode = 10
-        versionName = "3.2"
+        versionCode = 11
+        versionName = "3.3"
     }
 
     buildTypes {
