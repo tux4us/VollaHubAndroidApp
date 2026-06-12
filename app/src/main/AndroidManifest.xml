@@ -45,5 +45,12 @@
             android:exported="false"
             android:label="Bericht-Historie"
             android:parentActivityName="com.volla.hub.DeviceReportActivity" />
+
+        <activity
+            android:name="com.volla.hub.ChatBotActivity"
+            android:exported="false"
+            android:label="HelpBot"
+            android:parentActivityName="com.volla.hub.MainActivity"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 </manifest>

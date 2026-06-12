@@ -38,6 +38,9 @@ class StartActivity : AppCompatActivity() {
                 R.id.nav_social -> {
                     showSocialMediaDialog()
                 }
+                R.id.nav_chat -> {
+                    startActivity(Intent(this, ChatBotActivity::class.java))
+                }
             }
             true
         }
@@ -48,6 +51,9 @@ class StartActivity : AppCompatActivity() {
     private fun setupButtons() {
         binding.btnNavReportFull.setOnClickListener {
             startActivity(Intent(this, DeviceReportActivity::class.java))
+        }
+        binding.btnNavChatFull.setOnClickListener {
+            startActivity(Intent(this, ChatBotActivity::class.java))
         }
         binding.btnNavOnline.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java).apply {
