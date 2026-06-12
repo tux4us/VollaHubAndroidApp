@@ -2,22 +2,22 @@
 <resources>
     <style name="Theme.VollaHub" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Echtes Dark-Theme (Black) -->
-        <item name="colorPrimary">#730D0D</item>
+        <item name="colorPrimary">#FFB4AB</item> <!-- Helles Rot für Texte/Icons -->
         <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorPrimaryContainer">#560003</item>
+        <item name="colorPrimaryContainer">#730D0D</item> <!-- Dunkles Volla-Rot für Container -->
         <item name="colorOnPrimaryContainer">#FFDAD6</item>
         <item name="colorSecondary">#E7BDB8</item>
         <item name="colorOnSecondary">#442926</item>
         <item name="colorSurface">#000000</item>
         <item name="colorOnSurface">#FFFFFF</item>
         <item name="colorOutline">#857371</item>
-        <item name="colorSurfaceVariant">#212121</item>
+        <item name="colorSurfaceVariant">#121212</item>
         <item name="colorOnSurfaceVariant">#E0E0E0</item>
 
         <item name="android:statusBarColor">#730D0D</item>
         <item name="android:windowBackground">#000000</item>
 
-        <!-- Material 3 Card Fixes für Dark Mode -->
+        <!-- Fix für Cards im Dark Mode -->
         <item name="cardBackgroundColor">#121212</item>
     </style>
 </resources>

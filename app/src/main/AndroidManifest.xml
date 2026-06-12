@@ -38,5 +38,11 @@
             android:exported="false"
             android:label="Geräte-Report"
             android:parentActivityName="com.volla.hub.MainActivity" />
+
+        <activity
+            android:name="com.volla.hub.ReportHistoryActivity"
+            android:exported="false"
+            android:label="Bericht-Historie"
+            android:parentActivityName="com.volla.hub.DeviceReportActivity" />
     </application>
 </manifest>

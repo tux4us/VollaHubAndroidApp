@@ -1,15 +1,21 @@
 package com.volla.hub
 
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Paint
+import android.graphics.RectF
 import android.graphics.pdf.PdfDocument
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Environment
+import android.os.*
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.volla.hub.databinding.ActivityDeviceReportBinding
 import java.io.File
 import java.io.FileOutputStream
@@ -18,10 +24,12 @@ import java.util.*
 class DeviceReportActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDeviceReportBinding
     private val selectedImages = mutableListOf<Uri>()
+    private lateinit var imageAdapter: SelectedImageAdapter
+    private lateinit var reportStorage: ReportStorage
 
     private val pickImage = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
         selectedImages.addAll(uris)
-        updateImageCount()
+        imageAdapter.setImages(selectedImages)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,38 +37,93 @@ class DeviceReportActivity : AppCompatActivity() {
         binding = ActivityDeviceReportBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        reportStorage = ReportStorage(this)
+        imageAdapter = SelectedImageAdapter { uri ->
+            selectedImages.remove(uri)
+            imageAdapter.setImages(selectedImages)
+        }
+
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Geräte-Report"
 
+        binding.rvImages.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.rvImages.adapter = imageAdapter
+
         displayDeviceSpecs()
+        autoDetectStatus()
 
-        binding.btnAddPhoto.setOnClickListener {
-            pickImage.launch("image/*")
+        binding.btnAddPhoto.setOnClickListener { pickImage.launch("image/*") }
+        binding.btnShare.setOnClickListener { shareReport() }
+        binding.btnSavePdf.setOnClickListener { saveAndStoreReport() }
+        binding.btnCopySpecs.setOnClickListener { copySpecsToClipboard() }
+        binding.btnViewHistory.setOnClickListener { 
+            startActivity(Intent(this, ReportHistoryActivity::class.java))
         }
 
-        binding.btnShare.setOnClickListener {
-            shareReport()
+        binding.btnNewReport.setOnClickListener { 
+            resetToNewReport()
         }
 
-        binding.btnSavePdf.setOnClickListener {
-            saveAsPdf()
-        }
-
-        binding.btnCopySpecs.setOnClickListener {
-            copySpecsToClipboard()
+        // Check if we are viewing an existing report
+        intent.getStringExtra("report_json")?.let { json ->
+            val report = com.google.gson.Gson().fromJson(json, DeviceReport::class.java)
+            loadReportIntoFields(report)
+            binding.btnNewReport.visibility = View.VISIBLE
         }
     }
 
-    private fun copySpecsToClipboard() {
-        val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-        val clip = android.content.ClipData.newPlainText("Volla Device Specs", binding.tvDeviceSpecs.text)
-        clipboard.setPrimaryClip(clip)
-        Toast.makeText(this, "Spezifikationen in die Zwischenablage kopiert", Toast.LENGTH_SHORT).show()
+    private fun resetToNewReport() {
+        binding.etNoteTitle.setText("")
+        binding.etNoteContent.setText("")
+        selectedImages.clear()
+        imageAdapter.setImages(selectedImages)
+        displayDeviceSpecs()
+        autoDetectStatus()
+        binding.btnNewReport.visibility = View.GONE
+        Toast.makeText(this, "Bereit für neuen Bericht", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun loadReportIntoFields(report: DeviceReport) {
+        binding.etNoteTitle.setText(report.title)
+        binding.etNoteContent.setText(report.note)
+        binding.tvDeviceSpecs.text = report.specs
+        binding.swShelter.isChecked = report.shelterActive
+        binding.swSecurityMode.isChecked = report.securityModeActive
+        binding.swVpn.isChecked = report.vpnActive
+        
+        // Load images if they still exist
+        selectedImages.clear()
+        report.imagePaths.forEach { path ->
+            val file = File(path)
+            if (file.exists()) {
+                selectedImages.add(Uri.fromFile(file))
+            }
+        }
+        imageAdapter.setImages(selectedImages)
+        
+        // Disable editing for history? The user didn't specify, 
+        // but usually, viewing history is read-only or at least suggests it.
+        // For now, let's keep it editable so they can "resend" it.
+    }
+
+    private fun autoDetectStatus() {
+        binding.swVpn.isChecked = isVpnActive()
+        // Shelter/Profile detection is complex, but we can check if there are multiple users
+        val userManager = getSystemService(Context.USER_SERVICE) as UserManager
+        binding.swShelter.isChecked = userManager.userProfiles.size > 1
+    }
+
+    private fun isVpnActive(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val caps = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+        return caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
     }
 
     private fun displayDeviceSpecs() {
         val specs = StringBuilder()
+        specs.append("--- BASIS DATEN ---\n")
         specs.append("HERSTELLER: ${Build.MANUFACTURER}\n")
         specs.append("MODELL: ${Build.MODEL}\n")
         specs.append("GERÄT: ${Build.DEVICE}\n")
@@ -69,13 +132,29 @@ class DeviceReportActivity : AppCompatActivity() {
         specs.append("ANDROID VERSION: ${Build.VERSION.RELEASE}\n")
         specs.append("SDK VERSION: ${Build.VERSION.SDK_INT}\n")
         specs.append("BUILD ID: ${Build.ID}\n")
+        
+        // Batterie Status
+        val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { filter ->
+            baseContext.registerReceiver(null, filter)
+        }
+        val level: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+        val scale: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
+        val batteryPct = level * 100 / scale.toFloat()
+        val health = when(batteryStatus?.getIntExtra(BatteryManager.EXTRA_HEALTH, -1)) {
+            BatteryManager.BATTERY_HEALTH_GOOD -> "Gut"
+            BatteryManager.BATTERY_HEALTH_OVERHEAT -> "Überhitzt"
+            BatteryManager.BATTERY_HEALTH_DEAD -> "Defekt"
+            else -> "Unbekannt"
+        }
+        
+        specs.append("\n--- ENERGIE ---\n")
+        specs.append("BATTERIE LADESTAND: $batteryPct%\n")
+        specs.append("BATTERIE ZUSTAND: $health\n")
+        
+        specs.append("\n--- SYSTEM ---\n")
         specs.append("FINGERPRINT: ${Build.FINGERPRINT}\n")
         
         binding.tvDeviceSpecs.text = specs.toString()
-    }
-
-    private fun updateImageCount() {
-        binding.tvPhotoCount.text = "${selectedImages.size} Fotos ausgewählt"
     }
 
     private fun getFullReportText(): String {
@@ -86,44 +165,54 @@ class DeviceReportActivity : AppCompatActivity() {
         return "VOLLA GERÄTE REPORT\n\n" +
                 "TITEL: $title\n\n" +
                 "NOTIZ:\n$note\n\n" +
+                "ZUSÄTZLICHE INFOS:\n" +
+                "- Shelter/Profil aktiv: ${if (binding.swShelter.isChecked) "Ja" else "Nein"}\n" +
+                "- Sicherheitsmodus aktiv: ${if (binding.swSecurityMode.isChecked) "Ja" else "Nein"}\n" +
+                "- VPN aktiv: ${if (binding.swVpn.isChecked) "Ja" else "Nein"}\n\n" +
                 "SYSTEM-SPEZIFIKATIONEN:\n$specs"
     }
 
     private fun shareReport() {
         val reportText = getFullReportText()
-        
-        if (selectedImages.isEmpty()) {
-            val intent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_SUBJECT, "Volla Support Report: ${binding.etNoteTitle.text}")
-                putExtra(Intent.EXTRA_TEXT, reportText)
-            }
-            startActivity(Intent.createChooser(intent, "Report teilen via..."))
-        } else {
-            // Telegram und andere Apps brauchen oft ein klares 'image/*' 
-            // oder 'message/rfc822' bei Text+Bild Mix.
-            // Wir nutzen 'image/*' als Basis, da Bilder vorhanden sind.
-            val intent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
-                type = "image/*" 
-                putExtra(Intent.EXTRA_SUBJECT, "Volla Support Report: ${binding.etNoteTitle.text}")
-                // WICHTIG: Manche Apps erwarten den Text in EXTRA_STREAM als Datei, 
-                // aber die meisten nutzen EXTRA_TEXT als Caption für Bilder.
-                putExtra(Intent.EXTRA_TEXT, reportText)
-                putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(selectedImages))
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-            // Explizit den Typ auf mixed setzen für bessere Kompatibilität
-            intent.type = "*/*"
-            startActivity(Intent.createChooser(intent, "Report teilen via..."))
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_SUBJECT, "Volla Support Report: ${binding.etNoteTitle.text}")
+            putExtra(Intent.EXTRA_TEXT, reportText)
         }
+        startActivity(Intent.createChooser(intent, "Report teilen via..."))
     }
 
-    private fun saveAsPdf() {
+    private fun saveAndStoreReport() {
+        // Save images to internal storage to keep them permanent
+        val internalImagePaths = mutableListOf<String>()
+        selectedImages.forEachIndexed { index, uri ->
+            try {
+                val inputStream = contentResolver.openInputStream(uri)
+                val file = File(filesDir, "report_img_${System.currentTimeMillis()}_$index.jpg")
+                val outputStream = FileOutputStream(file)
+                inputStream?.copyTo(outputStream)
+                inputStream?.close()
+                outputStream.close()
+                internalImagePaths.add(file.absolutePath)
+            } catch (e: Exception) { e.printStackTrace() }
+        }
+
+        val report = DeviceReport(
+            title = binding.etNoteTitle.text.toString(),
+            note = binding.etNoteContent.text.toString(),
+            specs = binding.tvDeviceSpecs.text.toString(),
+            shelterActive = binding.swShelter.isChecked,
+            securityModeActive = binding.swSecurityMode.isChecked,
+            vpnActive = binding.swVpn.isChecked,
+            imagePaths = internalImagePaths
+        )
+        reportStorage.saveReport(report)
+        saveAsPdf(report)
+    }
+
+    private fun saveAsPdf(report: DeviceReport) {
         val pdfDocument = PdfDocument()
         val paint = Paint()
-        val textPaint = Paint().apply {
-            textSize = 12f
-        }
         
         // --- SEITE 1: TEXT ---
         var pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
@@ -139,9 +228,11 @@ class DeviceReportActivity : AppCompatActivity() {
         paint.textSize = 12f
         paint.isFakeBoldText = false
         
-        val lines = getFullReportText().split("\n")
+        val reportText = getFullReportText()
+        val lines = reportText.split("\n")
         for (line in lines) {
-            if (y > 800) {
+            if (y > 780) {
+                drawFooter(canvas)
                 pdfDocument.finishPage(page)
                 pageInfo = PdfDocument.PageInfo.Builder(595, 842, pdfDocument.pages.size + 1).create()
                 page = pdfDocument.startPage(pageInfo)
@@ -151,59 +242,92 @@ class DeviceReportActivity : AppCompatActivity() {
             canvas.drawText(line, 50f, y, paint)
             y += 20f
         }
+        drawFooter(canvas)
         pdfDocument.finishPage(page)
 
-        // --- WEITERE SEITEN: BILDER ---
-        for (uri in selectedImages) {
-            try {
-                val inputStream = contentResolver.openInputStream(uri)
-                val bitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
-                inputStream?.close()
-
-                if (bitmap != null) {
-                    pageInfo = PdfDocument.PageInfo.Builder(595, 842, pdfDocument.pages.size + 1).create()
-                    page = pdfDocument.startPage(pageInfo)
-                    canvas = page.canvas
-
-                    // Bild skalieren, um auf die Seite zu passen (mit Rand)
-                    val maxWidth = 495f // 50f Rand links/rechts
-                    val maxHeight = 742f // 50f Rand oben/unten
-                    
-                    val scale = Math.min(maxWidth / bitmap.width, maxHeight / bitmap.height)
-                    val drawWidth = bitmap.width * scale
-                    val drawHeight = bitmap.height * scale
-                    
-                    val left = (595f - drawWidth) / 2
-                    val top = (842f - drawHeight) / 2
-
-                    canvas.drawBitmap(bitmap, null, android.graphics.RectF(left, top, left + drawWidth, top + drawHeight), null)
-                    
-                    // Bildunterschrift (Optional)
-                    canvas.drawText("Anhang Bild ${pdfDocument.pages.size}", 50f, 810f, textPaint)
-                    
-                    pdfDocument.finishPage(page)
-                    bitmap.recycle() // Speicher freigeben
-                }
-            } catch (e: Exception) {
-                android.util.Log.e("DeviceReport", "Fehler beim Hinzufügen von Bild zu PDF: ${e.message}")
+        // --- BILDER ---
+        report.imagePaths.forEach { path ->
+            val bitmap = android.graphics.BitmapFactory.decodeFile(path)
+            if (bitmap != null) {
+                pageInfo = PdfDocument.PageInfo.Builder(595, 842, pdfDocument.pages.size + 1).create()
+                page = pdfDocument.startPage(pageInfo)
+                canvas = page.canvas
+                
+                val scale = Math.min(495f / bitmap.width, 700f / bitmap.height)
+                val dw = bitmap.width * scale
+                val dh = bitmap.height * scale
+                canvas.drawBitmap(bitmap, null, RectF(50f, 50f, 50f + dw, 50f + dh), null)
+                
+                drawFooter(canvas)
+                pdfDocument.finishPage(page)
+                bitmap.recycle()
             }
         }
 
         val fileName = "VollaReport_${System.currentTimeMillis()}.pdf"
-        
         try {
-            val documentsDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "Volla")
-            if (!documentsDir.exists()) documentsDir.mkdirs()
-            
-            val file = File(documentsDir, fileName)
+            val dir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "Volla")
+            if (!dir.exists()) dir.mkdirs()
+            val file = File(dir, fileName)
             pdfDocument.writeTo(FileOutputStream(file))
-            Toast.makeText(this, "PDF gespeichert in: ${file.absolutePath}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "PDF gespeichert: ${file.absolutePath}", Toast.LENGTH_LONG).show()
         } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "Fehler beim Speichern der PDF: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Fehler: ${e.message}", Toast.LENGTH_SHORT).show()
         } finally {
             pdfDocument.close()
         }
+    }
+
+    private fun drawFooter(canvas: android.graphics.Canvas) {
+        val footerPaint = Paint().apply {
+            textSize = 10f
+            color = android.graphics.Color.GRAY
+            textAlign = Paint.Align.CENTER
+        }
+        canvas.drawText("Erstellt mit VollaHub für Android. Eine App entwickelt von https://github.com/tux4us für die Community.", 297f, 820f, footerPaint)
+    }
+
+    private fun copySpecsToClipboard() {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+        val clip = android.content.ClipData.newPlainText("Volla Device Specs", binding.tvDeviceSpecs.text)
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(this, "Spezifikationen kopiert", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+            R.id.action_home -> {
+                val intent = Intent(this, StartActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                startActivity(intent)
+                true
+            }
+            R.id.action_theme -> {
+                toggleTheme()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun toggleTheme() {
+        val prefs = getSharedPreferences("settings", Context.MODE_PRIVATE)
+        val currentDark = prefs.getBoolean("dark_theme", false)
+        prefs.edit().putBoolean("dark_theme", !currentDark).apply()
+        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+            if (!currentDark) androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+            else androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+        )
+        recreate()
     }
 
     override fun onSupportNavigateUp(): Boolean {
