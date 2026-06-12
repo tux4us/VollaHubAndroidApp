@@ -5,4 +5,13 @@
     <string name="refresh">Aktualisieren</string>
     <string name="error_loading">Fehler beim Laden: %s</string>
     <string name="no_articles">Keine Artikel gefunden</string>
+    <string name="btn_report_support">Gerätereport - Supportanfrage</string>
+    <string name="btn_youtube">YouTube</string>
+    <string name="btn_github">GitHub</string>
+    <string name="nav_social">Soziale Netzwerke</string>
+    <string name="social_telegram">VollaCommunity auf Telegram</string>
+    <string name="social_x">Volla auf X</string>
+    <string name="social_facebook">Volla auf Facebook</string>
+    <string name="social_instagram">Volla auf Instagram</string>
+    <string name="social_mastodon">Volla auf Mastodon</string>
 </resources>

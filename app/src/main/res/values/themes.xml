@@ -14,5 +14,10 @@
 
         <item name="android:statusBarColor">#730D0D</item>
         <item name="android:windowBackground">?attr/colorSurface</item>
+
+        <!-- Toolbar Icon Fix -->
+        <item name="colorControlNormal">#FFFFFF</item>
+        <item name="actionBarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
     </style>
 </resources>

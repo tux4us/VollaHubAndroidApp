@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/volla_red"
-            app:titleTextColor="?attr/colorOnPrimary" />
+            app:titleTextColor="#FFFFFF" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -95,8 +95,39 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:columnCount="2"
-                android:alignmentMode="alignMargins"
-                android:columnOrderPreserved="false">
+                android:alignmentMode="alignMargins">
+
+                <!-- Support Report - Full Width -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnNavReportFull"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_columnSpan="2"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@color/volla_red">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:gravity="center">
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@android:drawable/ic_menu_info_details"
+                            app:tint="#FFFFFF"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/btn_report_support"
+                            android:layout_marginStart="16dp"
+                            android:textColor="#FFFFFF"
+                            android:textAppearance="?attr/textAppearanceLabelLarge"
+                            android:textStyle="bold"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
                 <!-- Online Pages -->
                 <com.google.android.material.card.MaterialCardView
@@ -104,6 +135,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
+                    android:layout_gravity="fill_horizontal"
                     android:layout_margin="8dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="2dp">
@@ -133,6 +165,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
+                    android:layout_gravity="fill_horizontal"
                     android:layout_margin="8dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="2dp">
@@ -162,6 +195,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
+                    android:layout_gravity="fill_horizontal"
                     android:layout_margin="8dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="2dp">
@@ -191,6 +225,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
+                    android:layout_gravity="fill_horizontal"
                     android:layout_margin="8dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="2dp">
@@ -214,33 +249,63 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Device Report -->
+                <!-- Youtube -->
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/btnNavReport"
+                    android:id="@+id/btnNavYoutube"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_columnSpan="2"
+                    android:layout_columnWeight="1"
+                    android:layout_gravity="fill_horizontal"
                     android:layout_margin="8dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="2dp">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:orientation="vertical"
                         android:padding="16dp"
                         android:gravity="center">
                         <ImageView
                             android:layout_width="32dp"
                             android:layout_height="32dp"
-                            android:src="@android:drawable/ic_menu_info_details"
+                            android:src="@android:drawable/ic_menu_slideshow"
                             app:tint="?attr/colorPrimary"/>
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Geräte-Report erstellen"
-                            android:layout_marginStart="16dp"
-                            android:textAppearance="?attr/textAppearanceLabelLarge"
-                            android:textStyle="bold"/>
+                            android:text="@string/btn_youtube"
+                            android:layout_marginTop="8dp"
+                            android:textAppearance="?attr/textAppearanceLabelLarge"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- GitHub -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnNavGithub"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_gravity="fill_horizontal"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:gravity="center">
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@android:drawable/ic_menu_compass"
+                            app:tint="?attr/colorPrimary"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/btn_github"
+                            android:layout_marginTop="8dp"
+                            android:textAppearance="?attr/textAppearanceLabelLarge"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </GridLayout>
@@ -256,6 +321,7 @@
         android:background="?attr/colorSurface"
         app:itemIconTint="@color/bottom_nav_tint"
         app:itemTextColor="@color/bottom_nav_tint"
+        app:itemActiveIndicatorStyle="@null"
         app:menu="@menu/menu_bottom_nav" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

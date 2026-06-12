@@ -3,6 +3,8 @@ package com.volla.hub
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -39,12 +41,12 @@ class ReportHistoryActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 
-    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
                 finish()
@@ -56,8 +58,39 @@ class ReportHistoryActivity : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
+            R.id.action_theme -> {
+                toggleTheme()
+                true
+            }
+            R.id.action_developer -> {
+                showDeveloperInfo()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun showDeveloperInfo() {
+        val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+        builder.setTitle("Entwickler")
+        builder.setMessage("Entwickler der App: tux4us\nGitHub: https://github.com/tux4us/VollaHubAndroidApp")
+        builder.setPositiveButton("GitHub öffnen") { _, _ ->
+            val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://github.com/tux4us/VollaHubAndroidApp"))
+            startActivity(intent)
+        }
+        builder.setNegativeButton("Schließen", null)
+        builder.show()
+    }
+
+    private fun toggleTheme() {
+        val prefs = getSharedPreferences("settings", MODE_PRIVATE)
+        val currentDark = prefs.getBoolean("dark_theme", false)
+        prefs.edit().putBoolean("dark_theme", !currentDark).apply()
+        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+            if (!currentDark) androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+            else androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+        )
+        recreate()
     }
 
     override fun onSupportNavigateUp(): Boolean {

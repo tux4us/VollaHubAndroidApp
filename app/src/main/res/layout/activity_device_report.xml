@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/volla_red"
-            app:titleTextColor="?attr/colorOnPrimary" />
+            app:titleTextColor="#FFFFFF" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -76,6 +76,43 @@
                         android:textColor="?android:attr/textColorPrimary"
                         android:fontFamily="monospace"
                         tools:text="Specs load here..."/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutline">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="RAM Auslastung (letzte 5 Min)"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="?attr/colorPrimary"
+                        android:layout_marginBottom="8dp"/>
+
+                    <com.volla.hub.RamChartView
+                        android:id="@+id/ramChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp" />
+
+                    <TextView
+                        android:id="@+id/tvRamStats"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        tools:text="RAM: 4GB / 6GB (66%)"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

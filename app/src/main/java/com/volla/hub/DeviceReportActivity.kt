@@ -1,5 +1,6 @@
 package com.volla.hub
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -14,7 +15,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.volla.hub.databinding.ActivityDeviceReportBinding
 import java.io.File
@@ -26,6 +26,13 @@ class DeviceReportActivity : AppCompatActivity() {
     private val selectedImages = mutableListOf<Uri>()
     private lateinit var imageAdapter: SelectedImageAdapter
     private lateinit var reportStorage: ReportStorage
+    private val handler = Handler(Looper.getMainLooper())
+    private val ramSampler = object : Runnable {
+        override fun run() {
+            updateRamStatus()
+            handler.postDelayed(this, 5000)
+        }
+    }
 
     private val pickImage = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
         selectedImages.addAll(uris)
@@ -52,6 +59,7 @@ class DeviceReportActivity : AppCompatActivity() {
 
         displayDeviceSpecs()
         autoDetectStatus()
+        handler.post(ramSampler)
 
         binding.btnAddPhoto.setOnClickListener { pickImage.launch("image/*") }
         binding.btnShare.setOnClickListener { shareReport() }
@@ -71,6 +79,25 @@ class DeviceReportActivity : AppCompatActivity() {
             loadReportIntoFields(report)
             binding.btnNewReport.visibility = View.VISIBLE
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacks(ramSampler)
+    }
+
+    private fun updateRamStatus() {
+        val mi = ActivityManager.MemoryInfo()
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        activityManager.getMemoryInfo(mi)
+        
+        val totalRam = mi.totalMem / (1024 * 1024)
+        val availableRam = mi.availMem / (1024 * 1024)
+        val usedRam = totalRam - availableRam
+        val usedPercent = (usedRam.toFloat() / totalRam.toFloat()) * 100
+        
+        binding.ramChart.addSample(usedPercent)
+        binding.tvRamStats.text = "RAM: ${usedRam}MB / ${totalRam}MB (${usedPercent.toInt()}%)"
     }
 
     private fun resetToNewReport() {
@@ -101,15 +128,10 @@ class DeviceReportActivity : AppCompatActivity() {
             }
         }
         imageAdapter.setImages(selectedImages)
-        
-        // Disable editing for history? The user didn't specify, 
-        // but usually, viewing history is read-only or at least suggests it.
-        // For now, let's keep it editable so they can "resend" it.
     }
 
     private fun autoDetectStatus() {
         binding.swVpn.isChecked = isVpnActive()
-        // Shelter/Profile detection is complex, but we can check if there are multiple users
         val userManager = getSystemService(Context.USER_SERVICE) as UserManager
         binding.swShelter.isChecked = userManager.userProfiles.size > 1
     }
@@ -151,6 +173,19 @@ class DeviceReportActivity : AppCompatActivity() {
         specs.append("BATTERIE LADESTAND: $batteryPct%\n")
         specs.append("BATTERIE ZUSTAND: $health\n")
         
+        // RAM Stats
+        val mi = ActivityManager.MemoryInfo()
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        activityManager.getMemoryInfo(mi)
+        val totalRam = mi.totalMem / (1024 * 1024)
+        val availableRam = mi.availMem / (1024 * 1024)
+        
+        specs.append("\n--- SPEICHER (RAM) ---\n")
+        specs.append("TOTAL RAM: ${totalRam}MB\n")
+        specs.append("VERFÜGBAR: ${availableRam}MB\n")
+        specs.append("LOW MEMORY: ${if (mi.lowMemory) "JA" else "NEIN"}\n")
+        specs.append("SCHWELLENWERT: ${mi.threshold / (1024 * 1024)}MB\n")
+        
         specs.append("\n--- SYSTEM ---\n")
         specs.append("FINGERPRINT: ${Build.FINGERPRINT}\n")
         
@@ -183,7 +218,6 @@ class DeviceReportActivity : AppCompatActivity() {
     }
 
     private fun saveAndStoreReport() {
-        // Save images to internal storage to keep them permanent
         val internalImagePaths = mutableListOf<String>()
         selectedImages.forEachIndexed { index, uri ->
             try {
@@ -245,6 +279,23 @@ class DeviceReportActivity : AppCompatActivity() {
         drawFooter(canvas)
         pdfDocument.finishPage(page)
 
+        // --- SEITE: RAM CHART ---
+        pageInfo = PdfDocument.PageInfo.Builder(595, 842, pdfDocument.pages.size + 1).create()
+        page = pdfDocument.startPage(pageInfo)
+        canvas = page.canvas
+        
+        paint.textSize = 14f
+        paint.isFakeBoldText = true
+        canvas.drawText("RAM Auslastungsverlauf (letzte 5 Minuten)", 50f, 50f, paint)
+        
+        val chartBitmap = viewToBitmap(binding.ramChart)
+        val chartScale = 495f / chartBitmap.width
+        val ch = chartBitmap.height * chartScale
+        canvas.drawBitmap(chartBitmap, null, RectF(50f, 80f, 50f + 495f, 80f + ch), null)
+        
+        drawFooter(canvas)
+        pdfDocument.finishPage(page)
+
         // --- BILDER ---
         report.imagePaths.forEach { path ->
             val bitmap = android.graphics.BitmapFactory.decodeFile(path)
@@ -276,6 +327,13 @@ class DeviceReportActivity : AppCompatActivity() {
         } finally {
             pdfDocument.close()
         }
+    }
+
+    private fun viewToBitmap(view: View): android.graphics.Bitmap {
+        val bitmap = android.graphics.Bitmap.createBitmap(view.width, view.height, android.graphics.Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(bitmap)
+        view.draw(canvas)
+        return bitmap
     }
 
     private fun drawFooter(canvas: android.graphics.Canvas) {
@@ -315,8 +373,24 @@ class DeviceReportActivity : AppCompatActivity() {
                 toggleTheme()
                 true
             }
+            R.id.action_developer -> {
+                showDeveloperInfo()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun showDeveloperInfo() {
+        val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+        builder.setTitle("Entwickler")
+        builder.setMessage("Entwickler der App: tux4us\nGitHub: https://github.com/tux4us/VollaHubAndroidApp")
+        builder.setPositiveButton("GitHub öffnen") { _, _ ->
+            val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://github.com/tux4us/VollaHubAndroidApp"))
+            startActivity(intent)
+        }
+        builder.setNegativeButton("Schließen", null)
+        builder.show()
     }
 
     private fun toggleTheme() {

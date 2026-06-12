@@ -35,8 +35,8 @@ class StartActivity : AppCompatActivity() {
                 R.id.nav_home -> {
                     // Bereits auf Home
                 }
-                R.id.nav_report -> {
-                    startActivity(Intent(this, DeviceReportActivity::class.java))
+                R.id.nav_social -> {
+                    showSocialMediaDialog()
                 }
             }
             true
@@ -46,6 +46,9 @@ class StartActivity : AppCompatActivity() {
     }
 
     private fun setupButtons() {
+        binding.btnNavReportFull.setOnClickListener {
+            startActivity(Intent(this, DeviceReportActivity::class.java))
+        }
         binding.btnNavOnline.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java).apply {
                 putExtra("view_type", MainActivity.VIEW_ONLINE)
@@ -66,9 +69,50 @@ class StartActivity : AppCompatActivity() {
                 putExtra("view_type", MainActivity.VIEW_FORUM)
             })
         }
-        binding.btnNavReport.setOnClickListener {
-            startActivity(Intent(this, DeviceReportActivity::class.java))
+        binding.btnNavYoutube.setOnClickListener {
+            openUrl("https://www.youtube.com/@HelloVolla", "YouTube")
         }
+        binding.btnNavGithub.setOnClickListener {
+            openUrl("https://github.com/hellovolla", "GitHub")
+        }
+    }
+
+    private fun openUrl(url: String, title: String) {
+        val intent = Intent(this, ContentActivity::class.java).apply {
+            putExtra("url", url)
+            putExtra("title", title)
+        }
+        startActivity(intent)
+    }
+
+    private fun showSocialMediaDialog() {
+        val platforms = arrayOf(
+            getString(R.string.social_telegram),
+            getString(R.string.social_x),
+            getString(R.string.social_facebook),
+            getString(R.string.social_instagram),
+            getString(R.string.social_mastodon)
+        )
+        val urls = arrayOf(
+            "https://t.me/hello_volla",
+            "https://x.com/hello_volla",
+            "https://www.facebook.com/hellovolla",
+            "https://www.instagram.com/hello_volla",
+            "https://mastodon.social/@volla"
+        )
+
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(R.string.nav_social)
+            .setItems(platforms) { _, which ->
+                val url = urls[which]
+                try {
+                    val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url))
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    openUrl(url, platforms[which])
+                }
+            }
+            .show()
     }
 
     private fun loadLatestBlog() {

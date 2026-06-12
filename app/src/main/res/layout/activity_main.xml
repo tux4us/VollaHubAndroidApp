@@ -16,8 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/volla_red"
-            app:titleTextColor="?attr/colorOnPrimary"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+            app:titleTextColor="#FFFFFF" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -186,6 +185,7 @@
         android:background="?attr/colorSurface"
         app:itemIconTint="@color/bottom_nav_tint"
         app:itemTextColor="@color/bottom_nav_tint"
+        app:itemActiveIndicatorStyle="@null"
         app:menu="@menu/menu_bottom_nav" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
