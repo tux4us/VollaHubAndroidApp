@@ -11,15 +11,18 @@ Eine native Android-App für die Volla-Community, die alle wichtigen Volla-Resso
 Volla Hub ist eine umfassende Android-App, die Zugriff auf alle wichtigen Volla-Plattformen bietet:
 
 - 🏠 **Hub Startseite** - Schneller Zugriff auf alle Bereiche und Highlights
+- 🤖 **Volla HelpBot** - Integrierter Support-Assistent für Wiki & Forum Suche
 - 🌐 **Volla Online** - Alle Seiten von volla.online hierarchisch organisiert
 - 📝 **Volla Blog** - Die neuesten Blogbeiträge mit Benachrichtigungsfunktion
 - 📚 **Volla Wiki** - Mehrsprachiges Wiki (DE, EN, ES, IT, CS, DA, NO, SV)
 - 💬 **Volla Forum** - Direktzugriff auf Unterforen in verschiedenen Sprachen
 - 🔍 **Geräte-Report** - Hardware/Software Spezifikationen auslesen und als PDF exportieren
+- 📱 **Social Media** - Direkte Verknüpfung zur Volla Community (Telegram, Mastodon, etc.)
 
 ## ✨ Features
 
 - ✅ **100% ohne Google-Dienste** - Perfekt für Volla-Geräte (Volla OS & Ubuntu Touch via Waydroid)
+- 🤖 **HelpBot Support** - Schnelle Antworten durch intelligente Suche in Volla-Ressourcen per Chat
 - 🌑 **True Black Dark Mode** - Optimiert für OLED-Displays (Schwarz/Rot Design)
 - 🔔 **Blog Notifications** - Hintergrundprüfung auf neue Blogartikel via WorkManager
 - 📄 **PDF Export** - Erstellung von Support-Berichten inkl. Notizen und Foto-Anhängen
@@ -66,11 +69,13 @@ app/src/main/
 ├── java/com/volla/hub/
 │   ├── StartActivity.kt         # Hub-Einstieg mit Blog-Highlights
 │   ├── MainActivity.kt          # Listenansichten für Online/Blog/Wiki/Forum
+│   ├── ChatBotActivity.kt       # Support-Assistent Chat Interface
 │   ├── DeviceReportActivity.kt  # System-Specs & PDF Export
 │   ├── ContentActivity.kt       # Optimierter Web-Viewer
+│   ├── VollaParser.kt           # Jsoup Parser Logik für alle Quellen
 │   ├── BlogNotificationWorker.kt # Hintergrund-Check für News
-│   ├── VollaParser.kt           # Jsoup Parser Logik
-│   └── ContentAdapter.kt        # RecyclerView Adapter
+│   ├── ChatAdapter.kt           # RecyclerView Adapter für HelpBot
+│   └── ContentAdapter.kt        # RecyclerView Adapter für Listen
 ├── res/
 │   ├── layout/                  # Material 3 XML-Layouts
 │   ├── menu/                    # Toolbar & BottomNav Definitionen
@@ -86,6 +91,11 @@ app/src/main/
 - Automatische Anzeige des neuesten Blog-Artikels direkt beim Start.
 - Hintergrundprüfung auf neue Posts (alle 6 Stunden) mit System-Benachrichtigung.
 
+### Volla HelpBot
+- Durchsucht das Wiki, Forum und Volla Online gleichzeitig.
+- Chat-basiertes Interface für intuitive Fragenstellung.
+- Verlinkt direkt auf die gefundenen Artikel für tiefergehende Informationen.
+
 ### Geräte-Report
 - Liest Hersteller, Modell, Hardware, Android-Version und Build-Fingerprint aus.
 - Erlaubt das Hinzufügen von Notizen und Galerie-Fotos für Support-Anfragen.
@@ -95,6 +105,10 @@ app/src/main/
 ### Volla Wiki & Forum
 - Vollständiger Zugriff auf das Wiki in 8 Sprachen.
 - Direkte Verknüpfung zu den länderspezifischen Foren.
+
+### Social Media & Community
+- Schnellzugriff auf Telegram, X (Twitter), Facebook, Instagram und Mastodon.
+- Integration der offiziellen YouTube und GitHub Kanäle.
 
 ## 🤝 Beitragen
 
