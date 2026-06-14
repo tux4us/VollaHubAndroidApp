@@ -144,7 +144,11 @@ class DeviceReportActivity : AppCompatActivity() {
     }
 
     private fun displayDeviceSpecs() {
+        val version = try {
+            packageManager.getPackageInfo(packageName, 0).versionName
+        } catch (e: Exception) { "3.5" }
         val specs = StringBuilder()
+        specs.append("Erstellt mit: VollaHub #$version\n\n")
         specs.append("--- BASIS DATEN ---\n")
         specs.append("HERSTELLER: ${Build.MANUFACTURER}\n")
         specs.append("MODELL: ${Build.MODEL}\n")
@@ -224,8 +228,12 @@ class DeviceReportActivity : AppCompatActivity() {
         val title = binding.etNoteTitle.text.toString()
         val note = binding.etNoteContent.text.toString()
         val specs = binding.tvDeviceSpecs.text.toString()
+        val version = try {
+            packageManager.getPackageInfo(packageName, 0).versionName
+        } catch (e: Exception) { "3.5" }
 
-        return "VOLLA GERÄTE REPORT\n\n" +
+        return "VOLLA GERÄTE REPORT\n" +
+                "Erstellt mit: VollaHub #$version\n\n" +
                 "TITEL: $title\n\n" +
                 "NOTIZ:\n$note\n\n" +
                 "ZUSÄTZLICHE INFOS:\n" +
@@ -410,9 +418,12 @@ class DeviceReportActivity : AppCompatActivity() {
     }
 
     private fun showDeveloperInfo() {
+        val version = try {
+            packageManager.getPackageInfo(packageName, 0).versionName
+        } catch (e: Exception) { "3.5" }
         val builder = androidx.appcompat.app.AlertDialog.Builder(this)
-        builder.setTitle("Entwickler")
-        builder.setMessage("Entwickler der App: tux4us\nGitHub: https://github.com/tux4us/VollaHubAndroidApp")
+        builder.setTitle("Appinfo")
+        builder.setMessage("App-Version: $version\n\nEntwickler der App: tux4us\nGitHub: https://github.com/tux4us/VollaHubAndroidApp")
         builder.setPositiveButton("GitHub öffnen") { _, _ ->
             val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://github.com/tux4us/VollaHubAndroidApp"))
             startActivity(intent)

@@ -29,6 +29,6 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/action_developer"
-        android:title="Entwickler"
+        android:title="Appinfo"
         app:showAsAction="never" />
 </menu>
