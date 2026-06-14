@@ -32,7 +32,8 @@
         <activity
             android:name="com.volla.hub.ContentActivity"
             android:exported="false"
-            android:parentActivityName="com.volla.hub.MainActivity" />
+            android:parentActivityName="com.volla.hub.MainActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden" />
 
         <activity
             android:name="com.volla.hub.DeviceReportActivity"
