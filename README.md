@@ -33,7 +33,7 @@ Volla Hub ist eine umfassende Android-App, die Zugriff auf alle wichtigen Volla-
 
 ## 🖼️ Screenshots
 
-![Screenshot_20260612-231208_Volla Hub.png](../../Bilder/Screenshot_20260612-231208_Volla%20Hub.png)
+<img width="1080" height="2400" alt="Screenshot_20260612-231208_Volla Hub" src="https://github.com/user-attachments/assets/94aeefae-3cf8-42be-85e4-4392cdc0a12f" />
 
 
 ## 🛠️ Technologie-Stack
