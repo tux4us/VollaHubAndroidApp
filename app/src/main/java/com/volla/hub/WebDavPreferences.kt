@@ -12,6 +12,7 @@ class WebDavPreferences(private val context: Context) {
         private const val KEY_SERVER_URL = "webdav_server_url"
         private const val KEY_USERNAME = "webdav_username"
         private const val KEY_PASSWORD = "webdav_password"
+        private const val KEY_ORS_KEY = "ors_api_key"
     }
 
     data class WebDavConfig(
@@ -29,6 +30,12 @@ class WebDavPreferences(private val context: Context) {
             .putString(KEY_PASSWORD, password)
             .apply()
     }
+
+    fun saveOrsKey(key: String) {
+        prefs().edit().putString(KEY_ORS_KEY, key).apply()
+    }
+
+    fun getOrsKey(): String = prefs().getString(KEY_ORS_KEY, "") ?: ""
 
     fun loadConfig(): WebDavConfig? {
         val p = prefs()

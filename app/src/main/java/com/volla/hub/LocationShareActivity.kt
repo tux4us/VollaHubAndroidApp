@@ -264,6 +264,9 @@ class LocationShareActivity : AppCompatActivity(), LocationListener {
     }
 
     private fun startNavigationTo(target: GeoPoint, label: String) {
+        if (prefs.getOrsKey().isBlank()) {
+            Toast.makeText(this, "Bitte OpenRouteService API-Key in den Einstellungen hinterlegen", Toast.LENGTH_LONG).show()
+        }
         isNavigating = true
         finalDestination = target
         binding.btnCenterLocation.text = "🧭 Stopp"
@@ -341,7 +344,9 @@ class LocationShareActivity : AppCompatActivity(), LocationListener {
     // ── ORS Backend ───────────────────────────────────────────────────────
 
     private fun fetchORS(fromLat: Double, fromLon: Double, toLat: Double, toLon: Double): RouteData {
-        val apiKey = "***REMOVED***"
+        val apiKey = prefs.getOrsKey()
+        if (apiKey.isBlank()) return RouteData(emptyList(), 0.0, 0.0)
+        
         val url  = "https://api.openrouteservice.org/v2/directions/$routingProfile/geojson"
         val body = JSONObject().apply {
             put("coordinates", JSONArray().apply {
@@ -510,6 +515,7 @@ class LocationShareActivity : AppCompatActivity(), LocationListener {
         val etUrl  = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etWebDavUrl)
         val etUser = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etWebDavUser)
         val etPass = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etWebDavPass)
+        val etOrs  = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etOrsKey)
         val btnTest = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnTestWebDav)
         val btnClear = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnClearWebDav)
         val tvResult = dialogView.findViewById<android.widget.TextView>(R.id.tvTestResult)
@@ -520,6 +526,7 @@ class LocationShareActivity : AppCompatActivity(), LocationListener {
             etUser.setText(it.username)
             etPass.setText(it.password)
         }
+        etOrs?.setText(prefs.getOrsKey())
 
         btnClear?.setOnClickListener {
             AlertDialog.Builder(this)
@@ -530,6 +537,7 @@ class LocationShareActivity : AppCompatActivity(), LocationListener {
                     etUrl.setText("")
                     etUser.setText("")
                     etPass.setText("")
+                    etOrs?.setText("")
                     checkWebDavConfig()
                     tvResult.text = "✅ Daten gelöscht"
                     tvResult.setTextColor(Color.GRAY)
@@ -581,10 +589,13 @@ class LocationShareActivity : AppCompatActivity(), LocationListener {
                 val url  = etUrl.text?.toString()?.trim() ?: ""
                 val user = etUser.text?.toString()?.trim() ?: ""
                 val pass = etPass.text?.toString()?.trim() ?: ""
+                val ors  = etOrs?.text?.toString()?.trim() ?: ""
+
                 if (url.isNotBlank() && user.isNotBlank()) {
                     prefs.saveCredentials(url, user, pass)
+                    prefs.saveOrsKey(ors)
                     checkWebDavConfig()
-                    Toast.makeText(this, "✅ WebDAV gespeichert", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "✅ Einstellungen gespeichert", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(this, "URL und Benutzername sind Pflichtfelder", Toast.LENGTH_SHORT).show()
                 }
