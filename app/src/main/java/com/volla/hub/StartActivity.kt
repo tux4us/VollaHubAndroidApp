@@ -55,6 +55,9 @@ class StartActivity : AppCompatActivity() {
         binding.btnNavChatFull.setOnClickListener {
             startActivity(Intent(this, ChatBotActivity::class.java))
         }
+        binding.btnNavLocationShare.setOnClickListener {
+            startActivity(Intent(this, LocationShareActivity::class.java))
+        }
         binding.btnNavOnline.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java).apply {
                 putExtra("view_type", MainActivity.VIEW_ONLINE)

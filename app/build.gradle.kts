@@ -13,8 +13,8 @@ android {
         applicationId = "com.volla.hub"
         minSdk = 24
         targetSdk = 36
-        versionCode = 14
-        versionName = "3.6"
+        versionCode = 15
+        versionName = "4.0"
     }
 
     buildTypes {
@@ -53,6 +53,8 @@ dependencies {
     //implementation(libs.markwon.core)
     implementation(libs.jsoup)
     implementation(libs.androidx.work)
+    implementation(libs.osmdroid.android)
+    implementation(libs.gson)
 
     testImplementation(libs.junit)
 
