@@ -4,24 +4,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_content"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="false">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/volla_red"
         android:fitsSystemWindows="true">
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/volla_red"
+            android:background="@android:color/transparent"
             app:titleTextColor="#FFFFFF" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
+        android:background="?attr/colorSurface"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <!-- Map (top 60%) -->
@@ -156,6 +158,15 @@
                             android:id="@+id/switchLocationShare"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
+
+                        <ImageButton
+                            android:id="@+id/btnWebDavSettings"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@android:drawable/ic_menu_manage"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            app:tint="?attr/colorPrimary"
+                            android:contentDescription="WebDAV Einstellungen" />
                     </LinearLayout>
 
                     <!-- Routing profile -->

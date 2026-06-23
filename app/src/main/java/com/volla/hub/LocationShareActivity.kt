@@ -130,6 +130,21 @@ class LocationShareActivity : AppCompatActivity(), LocationListener {
 
     override fun onSupportNavigateUp(): Boolean { finish(); return true }
 
+    override fun onCreateOptionsMenu(menu: android.view.Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_location_share, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_webdav_settings -> {
+                showWebDavConfigDialog()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     // ── Setup ─────────────────────────────────────────────────────────────
 
     private fun setupMap() {
@@ -168,6 +183,7 @@ class LocationShareActivity : AppCompatActivity(), LocationListener {
     }
 
     private fun setupListeners() {
+        binding.btnWebDavSettings.setOnClickListener { showWebDavConfigDialog() }
         binding.switchLocationShare.setOnClickListener {
             if (binding.switchLocationShare.isChecked) onShareEnabled() else onShareDisabled()
         }
