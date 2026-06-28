@@ -84,6 +84,12 @@ class StartActivity : AppCompatActivity() {
         binding.btnNavGithub.setOnClickListener {
             openUrl("https://github.com/hellovolla", "GitHub")
         }
+        binding.btnNavScreenshot.setOnClickListener {
+            startActivity(Intent(this, ScreenshotActivity::class.java))
+        }
+        binding.btnNavSimpleScreenshot.setOnClickListener {
+            startActivity(Intent(this, SimpleScreenshotActivity::class.java))
+        }
     }
 
     private fun openUrl(url: String, title: String) {

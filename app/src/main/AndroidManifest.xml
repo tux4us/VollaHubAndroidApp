@@ -8,6 +8,10 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
+
 
     <application
         android:name=".VollaHubApp"
@@ -63,6 +67,42 @@
             android:exported="false"
             android:label="Ortung"
             android:parentActivityName="com.volla.hub.StartActivity" />
+
+        <activity
+            android:name="com.volla.hub.ScreenshotActivity"
+            android:exported="false"
+            android:label="@string/btn_screenshot"
+            android:parentActivityName="com.volla.hub.StartActivity" />
+
+        <activity
+            android:name="com.volla.hub.SimpleScreenshotActivity"
+            android:exported="false"
+            android:label="@string/btn_simple_screenshot"
+            android:theme="@style/Theme.VollaHub.Translucent"
+            android:parentActivityName="com.volla.hub.StartActivity" />
+
+        <service
+            android:name="com.volla.hub.ScreenshotService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
+
+        <service
+            android:name="com.volla.hub.SimpleScreenshotService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
+
+        <service
+            android:name="com.volla.hub.ScrollingScreenshotService"
+            android:exported="true"
+            android:label="VollaHub Scroll-Dienst"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
 
         <service
             android:name="com.volla.hub.LocationShareService"

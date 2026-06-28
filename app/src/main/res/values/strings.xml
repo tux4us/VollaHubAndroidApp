@@ -8,6 +8,8 @@
     <string name="btn_report_support">Gerätereport - Supportanfrage</string>
     <string name="btn_youtube">YouTube</string>
     <string name="btn_github">GitHub</string>
+    <string name="btn_screenshot">Long Screenshot</string>
+    <string name="btn_simple_screenshot">Einfacher Screenshot</string>
     <string name="nav_social">Soziale Netzwerke</string>
     <string name="nav_chat">HelpBot</string>
     <string name="chat_welcome">Hallo! Ich bin der Volla HelpBot. Wie kann ich dir heute helfen?</string>
